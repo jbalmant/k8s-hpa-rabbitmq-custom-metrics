@@ -1,0 +1,27 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: my-custom-queue
+  namespace: default
+  annotations:
+    meta.helm.sh/release-name: kube-prometheus-stack
+    meta.helm.sh/release-namespace: default
+  labels:
+    app: kube-prometheus-stack
+    app.kubernetes.io/instance: kube-prometheus-stack
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/part-of: kube-prometheus-stack
+    app.kubernetes.io/version: 15.4.4
+    chart: kube-prometheus-stack-15.4.4
+    heritage: Helm
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: api-gateway-amqp-rules
+      rules:
+        - expr: >-
+            ceil(rabbitmq_queue_messages{queue="my-custom-queue"} / 10)
+          labels:
+            namespace: default
+            service: newCustomService
+          record: 'rabbitmq_queue_messages_my_custom_queue'
